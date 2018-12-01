@@ -1,7 +1,9 @@
 import java.io.File
 
 val input = args[0]
-val changes = File(input).readLines().map { it.toInt()}
+val changes = File(input)
+    .readLines()
+    .map(String::toInt)
 
 val frequencies = HashSet<Int>()
 var i = 0
