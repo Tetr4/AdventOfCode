@@ -12,4 +12,4 @@ do {
     frequency += changes[i]
     i = (i + 1) % changes.size
 } while (frequencies.add(frequency))
-print("Solution: $frequency")
+println("Solution: $frequency")
