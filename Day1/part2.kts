@@ -1,7 +1,6 @@
 import java.io.File
 
-val input = args[0]
-val changes = File(input)
+val changes = File(args[0])
     .readLines()
     .map(String::toInt)
 
