@@ -1,6 +1,6 @@
 import java.io.File
 
-fun String.hamming(other: String) = zip(other).count { it.first != it.second}
+fun String.hamming(other: String) = zip(other).count { it.first != it.second }
 fun String.intersect(other: String) = asIterable()
     .intersect(other.asIterable())
     .joinToString("")
