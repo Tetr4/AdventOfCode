@@ -1,0 +1,53 @@
+maintenance:
+    title: day 2 part 2;;
+    mlmname: part1;;
+    arden: version 2.5;;
+    version: 1.0;;
+    institution: appmotion;;
+    author: Mike Klimek;;
+    specialist: Mike Klimek;;
+    date: 2021-12-02;;
+    validation: testing;;
+
+library:
+    purpose: Solution for advent of code 2021 day 2 part 2;;
+    explanation: Just look at the code;;
+    keywords: arden syntax, arden2bytecode, advent of code;;
+    links: https://adventofcode.com/2021/day/2;;
+
+knowledge:
+    type: data_driven;;
+
+    data:
+        LET depth BE 0;
+        LET position BE 0;
+        LET aim BE 0;
+        LET input BE READ { enter input data as list of strings };
+    ;;
+
+    evoke: /* MLM is called directly */ ;;
+
+    logic:
+        FOR line IN input DO
+            LET num BE (LAST EXTRACT CHARACTERS line) AS NUMBER;
+            LET command BE SUBSTRING (LENGTH line - 2) CHARACTERS FROM line;
+            IF command EQ "up" THEN
+                aim := aim - num;
+            ELSEIF command EQ "down" THEN
+                aim := aim + num;
+            ELSEIF command EQ "forward" THEN
+                position := position + num;
+                depth := depth + aim * num;
+            ENDIF;
+        ENDDO;
+        LET solution BE depth * position;
+        CONCLUDE TRUE; // execute action slot
+    ;;
+
+    action:
+        WRITE "Aim: " || aim;
+        WRITE "Depth: " || depth;
+        WRITE "Position: " || position;
+        WRITE "Solution: " || solution;
+    ;;
+end:
