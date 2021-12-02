@@ -29,7 +29,7 @@ knowledge:
 
     logic:
         FOR line IN input DO
-            LET num BE (LAST EXTRACT CHARACTERS line) AS NUMBER;
+            LET num BE LAST (EXTRACT CHARACTERS line) AS NUMBER;
             LET command BE SUBSTRING (LENGTH line - 2) CHARACTERS FROM line;
             IF command EQ "up" THEN
                 aim := aim - num;
