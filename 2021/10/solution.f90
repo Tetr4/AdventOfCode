@@ -1,3 +1,6 @@
+! Try it here: https://www.tutorialspoint.com/compile_fortran_online.php
+! Make sure to append "EOF" to the STDIN input
+
 MODULE BracketStack
     IMPLICIT NONE
 
