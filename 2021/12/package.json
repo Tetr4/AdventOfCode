@@ -1,0 +1,19 @@
+{
+  "name": "12",
+  "version": "1.0.0",
+  "description": "",
+  "main": "solution.ts",
+  "dependencies": {
+    "ts-node": "^10.4.0",
+    "typescript": "^4.5.3"
+  },
+  "devDependencies": {
+    "@types/node": "^16.11.12",
+    "tslib": "^2.3.1"
+  },
+  "scripts": {
+    "start": "ts-node ."
+  },
+  "author": "",
+  "license": "MIT"
+}
