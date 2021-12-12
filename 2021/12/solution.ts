@@ -16,15 +16,6 @@ class Cave {
     }
 }
 
-function solution() {
-    const input = fs.readFileSync(process.argv[2], 'utf8');
-    const caves = readCaves(input);
-    const start = caves.find((it) => it.name == 'start')!;
-    const end = caves.find((it) => it.name == 'end')!;
-    const paths = findPaths(start, end);
-    console.log(paths.length);
-}
-
 function readCaves(input: string): Cave[] {
     const caves: Cave[] = [];
     const lines = input.split('\n');
@@ -46,26 +37,51 @@ function readCaves(input: string): Cave[] {
     return caves;
 }
 
+function solvePart1(caves: Cave[]): number {
+    const start = caves.find((it) => it.name == 'start')!;
+    const end = caves.find((it) => it.name == 'end')!;
+    const paths = findPaths(start, end);
+    return paths.length;
+}
+
+function solvePart2(caves: Cave[]): number {
+    const start = caves.find((it) => it.name == 'start')!;
+    const end = caves.find((it) => it.name == 'end')!;
+    const smallCaves = caves.filter((it) => it.small && it != end && it != start);
+    const paths = smallCaves
+        .flatMap((doubleVisitCave) => findPaths(start, end, doubleVisitCave))
+        .map((path) => path.map((it) => it.name).join())
+    const distinct = new Set(paths);
+    return distinct.size;
+}
+
 function findPaths(
     start: Cave,
     end: Cave,
+    doubleVisitCave?: Cave,
+    doubleVisited = false,
     visited: Cave[] = [start],
     path: Cave[] = [start]
 ): Cave[][] {
     let paths: Cave[][] = []
-    const notVisited = start.connections.filter((it) => !visited.includes(it));
-    notVisited.sort((a, b) => a.name.localeCompare(b.name));
+    const notVisited = start.connections.filter((it) => {
+        return !visited.includes(it) || (it == doubleVisitCave && !doubleVisited)
+    });
     for (const cave of notVisited) {
         const subPath = [...path, cave];
         if (cave == end) {
             paths = [...paths, subPath];
         } else {
+            const subDoubleVisited = cave == doubleVisitCave ? visited.includes(cave) : doubleVisited;
             const subVisited = cave.small ? [...visited, cave] : [...visited];
-            const subPaths = findPaths(cave, end, subVisited, subPath)
+            const subPaths = findPaths(cave, end, doubleVisitCave, subDoubleVisited, subVisited, subPath)
             paths = [...paths, ...subPaths];
         }
     }
     return paths;
 }
 
-solution();
+const input = fs.readFileSync(process.argv[2], 'utf8');
+const caves = readCaves(input);
+console.log(`Part 1: ${solvePart1(caves)}`);
+console.log(`Part 2: ${solvePart2(caves)}`);
