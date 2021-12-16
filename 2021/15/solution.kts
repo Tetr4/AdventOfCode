@@ -1,33 +1,54 @@
-
+// To prevent OutOfMemoryError: export JAVA_OPTS="-Xmx8g"
+// kotlinc -script solution.kts sample.txt
 import java.io.File
+import kotlin.system.measureTimeMillis
+import java.util.PriorityQueue
 
-data class Graph<T>(
-    val vertices: Set<T>,
-    val edges: Map<T, Set<T>>,
-    val weights: Map<T, Int>,
+data class Graph<V>(
+    val vertices: Set<V>,
+    val edges: Map<V, Set<V>>,
+    val weights: Map<V, Int>,
 ) {
-    fun dijkstra(start: T): Map<T, T?> {
-        val solved = mutableSetOf<T>()
-        val delta = vertices.map { it to Int.MAX_VALUE }.toMap().toMutableMap().also {
+    fun findShortestPath(start: V, end: V): List<V> {
+        val tree = dijkstra(start)
+        fun pathTo(end: V): List<V> {
+            if (tree[end] == null) return listOf(end)
+            return pathTo(tree[end]!!) + listOf(end)
+        }
+        return pathTo(end)
+    }
+
+    private fun dijkstra(start: V): Map<V, V?> {
+        val distances: MutableMap<V, Int> = vertices.associateWith { Int.MAX_VALUE }.toMutableMap().also {
             it[start] = 0
         }
-        val previous = vertices.map { it to null as T? }.toMap().toMutableMap()
-        while (solved != vertices) {
-            val current: T = delta
-                .filter { !solved.contains(it.key) }
-                .minByOrNull { it.value }!!
-                .key
-            edges.getValue(current).minus(solved).forEach { neighbor ->
-                val newPath = delta.getValue(current) + weights.getValue(neighbor)
-                if (newPath < delta.getValue(neighbor)) {
-                    delta[neighbor] = newPath
+        val unvisited = PriorityQueue<V> {a, b -> distances[a]!!.compareTo(distances[b]!!)}.also {
+            it.addAll(vertices)
+        }
+        val previous: MutableMap<V, V?> = vertices.associateWith { null }.toMutableMap()
+        while (unvisited.isNotEmpty()) {
+            val current: V = unvisited.poll()!!
+            printProgress(unvisited.size, vertices.size)
+            edges[current]!!.forEach { neighbor ->
+                val newPath = distances[current]!! + weights[neighbor]!!
+                if (newPath < distances[neighbor]!!) {
+                    distances[neighbor] = newPath
+                    unvisited.remove(neighbor)
+                    unvisited.add(neighbor)
                     previous[neighbor] = current
                 }
             }
-            solved.add(current)
         }
-        return previous.toMap()
+        clearTerminal()
+        return previous
     }
+
+    private fun printProgress(remaining: Int, total: Int) {
+        val progress = "%.2f".format((total - remaining) * 100f / total)
+        print("\rProgress: $progress%")
+    }
+
+    private fun clearTerminal() = print("\r${" ".repeat(20)}\r")
 }
 
 data class Point(
@@ -78,17 +99,10 @@ data class Maze(
         },
     )
 
+    fun findShortestPath(start: Point, end: Point): List<Point> =
+        this.toGraph().findShortestPath(start, end)
 
-    fun findShortestPath(start: Point, end: Point): List<Point> {
-        val tree = this.toGraph().dijkstra(start)
-        fun pathTo(end: Point): List<Point> {
-            if (tree[end] == null) return listOf(end)
-            return pathTo(tree[end]!!) + listOf(end)
-        }
-        return pathTo(end)
-    }
-
-    private fun toGraph(): Graph<Point> {
+   private fun toGraph(): Graph<Point> {
         val vertices = this.points.flatten().toSet()
         val edges: Map<Point, Set<Point>> = vertices.map {
             val top = points.getOrNull(it.x)?.getOrNull(it.y-1)
@@ -103,6 +117,7 @@ data class Maze(
 }
 
 val lines = File(args[0]).readLines()
+
 val maze = Maze.fromLines(lines)
 val part1 = maze
     .findShortestPath(maze.start, maze.end)
